@@ -14,7 +14,8 @@ function App() {
     form
       .validateFields()
       .then((values) => {
-        setTasks((prev) => [...prev, values]);
+        const newTask = { id: Date.now(), ...values };
+        setTasks((prev) => [...prev, newTask]);
         setIsModalOpen(false);
         form.resetFields();
       })
@@ -22,6 +23,11 @@ function App() {
   };
   const cancleModal = () => {
     setIsModalOpen(false);
+  };
+
+  const removeTask = (id) => {
+    const newTaskList = tasks.filter((task) => task.id !== id);
+    setTasks(newTaskList);
   };
   return (
     <main>
@@ -35,9 +41,16 @@ function App() {
             <List
               dataSource={tasks}
               locale={{ emptyText: "No tasks yet" }}
-              renderItem={(item, index) => (
-                <List.Item key={index}>
-                  <strong>{item.name}</strong> {item.task}
+              renderItem={(item) => (
+                <List.Item key={item.id}>
+                  <strong>{item.name}</strong> {item.task}{" "}
+                  <Button
+                    onClick={() => {
+                      removeTask(item.id);
+                    }}
+                  >
+                    Remove
+                  </Button>
                 </List.Item>
               )}
             ></List>
