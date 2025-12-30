@@ -1,12 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button, Form, Input, Layout, message, Modal, List } from "antd";
 import { Content, Header } from "antd/es/layout/layout";
 import TextArea from "antd/es/input/TextArea";
 
 function App() {
   const [form] = Form.useForm();
+
   const [tasks, setTasks] = useState([]);
+
+  useEffect(() => {
+    const savedTasks = localStorage.getItem("tasks");
+
+    if (savedTasks) {
+      setTasks(JSON.parse(savedTasks));
+    }
+  }, []);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
+
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -15,7 +26,11 @@ function App() {
       .validateFields()
       .then((values) => {
         const newTask = { id: Date.now(), ...values };
-        setTasks((prev) => [...prev, newTask]);
+        setTasks((prev) => {
+          const updated = [...prev, newTask];
+          localStorage.setItem("tasks", JSON.stringify(updated));
+          return updated;
+        });
         setIsModalOpen(false);
         form.resetFields();
       })
@@ -28,6 +43,7 @@ function App() {
   const removeTask = (id) => {
     const newTaskList = tasks.filter((task) => task.id !== id);
     setTasks(newTaskList);
+    localStorage.setItem("tasks", JSON.stringify(newTaskList));
   };
   return (
     <main>
